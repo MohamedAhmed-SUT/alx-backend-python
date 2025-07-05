@@ -32,3 +32,23 @@ The `1-batch_processing.py` script demonstrates a more performant way to process
 
 - **`stream_users_in_batches(batch_size)`**: This generator uses the cursor's `fetchmany()` method to yield lists of users (batches) instead of individual users. This reduces the number of interactions with the database, improving efficiency.
 - **`batch_processing(batch_size)`**: This function consumes the batches from the generator and then processes each user within the batch, in this case, filtering for users older than 25.
+
+
+---
+
+## Task 3: Lazy Loading Paginated Data
+
+The `2-lazy_paginate.py` script simulates fetching paginated data from an API or database in a memory-efficient way.
+
+- **`paginate_users(page_size, offset)`**: A helper function that fetches a single, specific "page" of data from the database using `LIMIT` and `OFFSET`.
+- **`lazy_pagination(page_size)`**: This is the core **generator**. It runs a loop that calls `paginate_users` to get one page at a time and `yield`s it. It only fetches the next page when the consumer of the generator (e.g., a `for` loop) requests it, making it "lazy" and efficient.
+
+
+---
+
+## Task 4: Memory-Efficient Aggregation with Generators
+
+The `4-stream_ages.py` script provides a powerful example of how generators can be used for efficient data aggregation.
+
+- **`stream_user_ages()`**: A generator that yields only the `age` of each user one at a time. This minimizes the data being processed.
+- **`calculate_average_age()`**: A function that consumes the `stream_user_ages` generator. It calculates the average age by maintaining a running total and count, without ever storing the full list of ages in memory. This demonstrates a key use case for generators in data science and large-scale data processing.
