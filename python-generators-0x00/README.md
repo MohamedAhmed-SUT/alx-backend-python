@@ -13,3 +13,12 @@ The `seed.py` script is the foundation for this project. It contains a set of fu
 4.  **Seeding** the table with sample data from the `user_data.csv` file, ensuring data is not inserted more than once.
 
 This script is imported by all subsequent task files to establish a database connection and interact with the data.
+
+
+---
+
+## Task 1: Stream Users with a Generator
+
+The `0-stream_users.py` script contains the `stream_users()` function.
+
+This function is a **generator** that connects to the database and fetches users one by one using the `yield` keyword. This approach is highly memory-efficient, as it avoids loading the entire `user_data` table into memory at once. It returns each user as a dictionary for convenient use.
