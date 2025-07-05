@@ -22,3 +22,13 @@ This script is imported by all subsequent task files to establish a database con
 The `0-stream_users.py` script contains the `stream_users()` function.
 
 This function is a **generator** that connects to the database and fetches users one by one using the `yield` keyword. This approach is highly memory-efficient, as it avoids loading the entire `user_data` table into memory at once. It returns each user as a dictionary for convenient use.
+
+
+---
+
+## Task 2: Batch Processing Large Data
+
+The `1-batch_processing.py` script demonstrates a more performant way to process data by handling it in batches.
+
+- **`stream_users_in_batches(batch_size)`**: This generator uses the cursor's `fetchmany()` method to yield lists of users (batches) instead of individual users. This reduces the number of interactions with the database, improving efficiency.
+- **`batch_processing(batch_size)`**: This function consumes the batches from the generator and then processes each user within the batch, in this case, filtering for users older than 25.
