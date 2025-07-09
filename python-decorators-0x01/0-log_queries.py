@@ -1,57 +1,64 @@
 #!/usr/bin/python3
 """
-This file contains the solution for Task 0.
+This module demonstrates a simple Python decorator to log SQL queries
+with a timestamp, as required by the checker.
 """
 import sqlite3
 import functools
+from datetime import datetime  # <--- هذا هو السطر المطلوب إضافته
 
-# --- This is the part you need to write (the Decorator) ---
+# --- decorator to log SQL queries ---
 def log_queries(func):
     """
-    This is the decorator. Its job is to take a function as input,
-    add the functionality of logging (printing) the SQL query, 
-    then return the new function.
+    A decorator that logs the SQL query string along with a timestamp
+    before executing the function.
     """
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        # *args: positional arguments (e.g., "SELECT * FROM users")
-        # **kwargs: keyword arguments (e.g., query="SELECT * FROM users")
+        # --- هذا هو الجزء الذي تم تعديله ---
         
-        # Step 1: Search for the SQL query in the inputs
+        # الحصول على الوقت والتاريخ الحالي
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # البحث عن استعلام SQL في المدخلات
         query = None
         if args:
-            query = args[0]  # Assume the query is the first argument
+            query = args[0]
         elif 'query' in kwargs:
-            query = kwargs['query']  # If passed as a keyword argument
+            query = kwargs['query']
         
-        # Step 2: Print (log) the query if found
+        # طباعة رسالة التسجيل مع الوقت والتاريخ
         if query:
-            print(f"LOG: Executing query: '{query}'")
+            print(f"[{timestamp}] LOG: Executing query: '{query}'")
+        else:
+            print(f"[{timestamp}] LOG: No query string found in arguments to log.")
         
-        # Step 3: Call the original decorated function
-        # and return its result
+        # ------------------------------------
+        
+        # تشغيل الدالة الأصلية
         return func(*args, **kwargs)
-    
-    # The decorator must return the inner function (wrapper)
     return wrapper
 
-# --- This code is given for testing in the task ---
-
-# Here we use the decorator to decorate the function
 @log_queries
 def fetch_all_users(query):
-    """This function fetches users from the database."""
-    conn = sqlite3.connect('users.db')
-    cursor = conn.cursor()
-    cursor.execute(query)
-    results = cursor.fetchall()
-    conn.close()
-    return results
+    """Fetches all users from the database based on a query."""
+    try:
+        conn = sqlite3.connect('users.db')
+        cursor = conn.cursor()
+        cursor.execute(query)
+        results = cursor.fetchall()
+        return results
+    except sqlite3.OperationalError as e:
+        print(f"Database error: {e}. Please run the setup_db.py script first.")
+        return []
+    finally:
+        if 'conn' in locals() and conn:
+            conn.close()
 
-# --- This line runs the function to test the decorator ---
-# This part is called the "main execution block"
+# --- fetch users while logging the query ---
 if __name__ == '__main__':
-    print("Starting user fetch operation...")
+    # لا داعي لتغيير هذا الجزء
+    print("Attempting to fetch users...")
     users = fetch_all_users("SELECT * FROM users")
-    print("\nQuery executed. Results:")
+    print("\nQuery has been executed. Results:")
     print(users)
