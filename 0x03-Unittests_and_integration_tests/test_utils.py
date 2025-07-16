@@ -1,53 +1,80 @@
 #!/usr/bin/env python3
 """
 This module contains unit tests for the functions in `utils.py`.
-It thoroughly tests `access_nested_map` for both valid and invalid cases.
+It tests `access_nested_map`, `get_json`, and `memoize`.
 """
 import unittest
 from parameterized import parameterized
-from utils import access_nested_map
+from unittest.mock import patch, Mock
+from utils import access_nested_map, get_json, memoize
 from typing import Mapping, Sequence, Any
 
 
 class TestAccessNestedMap(unittest.TestCase):
-    """
-    A test suite for the `utils.access_nested_map` function.
-    This class tests the function's ability to access values in
-    nested dictionaries using a key path.
-    """
+    """A test suite for the `utils.access_nested_map` function."""
 
     @parameterized.expand([
         ({"a": 1}, ("a",), 1),
         ({"a": {"b": 2}}, ("a",), {"b": 2}),
         ({"a": {"b": 2}}, ("a", "b"), 2),
     ])
-    def test_access_nested_map(self,
-                               nested_map: Mapping,
-                               path: Sequence,
-                               expected: Any) -> None:
-        """
-        Tests that `access_nested_map` returns the expected output
-        for a variety of valid nested map structures and paths.
-        """
+    def test_access_nested_map(self, nested_map: Mapping, path: Sequence, expected: Any) -> None:
+        """Tests that `access_nested_map` returns the expected output."""
         self.assertEqual(access_nested_map(nested_map, path), expected)
 
     @parameterized.expand([
         ({}, ("a",)),
         ({"a": 1}, ("a", "b")),
     ])
-    def test_access_nested_map_exception(self,
-                                         nested_map: Mapping,
-                                         path: Sequence) -> None:
-        """
-        Tests that a KeyError is raised when `access_nested_map` is
-        called with a path that does not exist within the nested map.
-        """
+    def test_access_nested_map_exception(self, nested_map: Mapping, path: Sequence) -> None:
+        """Tests that a KeyError is raised for invalid paths."""
         with self.assertRaises(KeyError) as context:
             access_nested_map(nested_map, path)
-        # This checks that the exception message is the key that was not found.
-        # Although not strictly required by the prompt, it's good practice.
         self.assertEqual(str(context.exception), f"'{path[-1]}'")
 
 
-# You will add the other test classes (TestGetJson, TestMemoize) below this
-# as you complete the next tasks.
+class TestGetJson(unittest.TestCase):
+    """A test suite for the `utils.get_json` function."""
+
+    @parameterized.expand([
+        ("http://example.com", {"payload": True}),
+        ("http://holberton.io", {"payload": False}),
+    ])
+    def test_get_json(self, test_url: str, test_payload: dict) -> None:
+        """
+        Tests that `get_json` works correctly by mocking HTTP calls.
+        """
+        mock_response = Mock()
+        mock_response.json.return_value = test_payload
+        
+        with patch('utils.requests.get', return_value=mock_response) as mocked_get:
+            result = get_json(test_url)
+            mocked_get.assert_called_once_with(test_url)
+            self.assertEqual(result, test_payload)
+
+
+class TestMemoize(unittest.TestCase):
+    """A test suite for the `utils.memoize` decorator."""
+
+    def test_memoize(self) -> None:
+        """
+        Tests that the `memoize` decorator caches the result of a method.
+        """
+        class TestClass:
+            """A test class with a method and a memoized property."""
+            def a_method(self):
+                return 42
+
+            @memoize
+            def a_property(self):
+                return self.a_method()
+
+        with patch.object(TestClass, 'a_method', return_value=42) as mocked_method:
+            instance = TestClass()
+            
+            # Call the property twice
+            self.assertEqual(instance.a_property, 42)
+            self.assertEqual(instance.a_property, 42)
+            
+            # Assert that the underlying method was only called once
+            mocked_method.assert_called_once()
