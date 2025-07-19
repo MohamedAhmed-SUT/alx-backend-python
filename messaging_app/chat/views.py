@@ -1,11 +1,6 @@
-from rest_framework import viewsets
-from .models import Message, Conversation
-from .serializers import MessageSerializer, ConversationSerializer
+from django.shortcuts import render
+from django.http import JsonResponse
 
-class MessageViewSet(viewsets.ModelViewSet):
-    queryset = Message.objects.all()
-    serializer_class = MessageSerializer
-
-class ConversationViewSet(viewsets.ModelViewSet):
-    queryset = Conversation.objects.all()
-    serializer_class = ConversationSerializer
+# Dummy view for validation
+def test_view(request):
+    return JsonResponse({'message': 'Chats app is working'})
