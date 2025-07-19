@@ -1,6 +1,9 @@
-from django.shortcuts import render
-from django.http import JsonResponse
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
-# Dummy view for validation
-def test_view(request):
-    return JsonResponse({'message': 'Chats app is working'})
+class HealthCheckView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({'status': 'Chats app is active'})
