@@ -1,6 +1,7 @@
-from django.urls import path
-from .views import MessageListCreateAPIView
+from django.contrib import admin
+from django.urls import path, include
 
 urlpatterns = [
-    path('messages/', MessageListCreateAPIView.as_view(), name='message-list-create'),
+    path('admin/', admin.site.urls),
+    path('api/v1/', include('chat.urls')), # Include chat app URLs
 ]
