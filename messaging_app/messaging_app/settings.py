@@ -18,3 +18,5 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
     ],
 }
+# Tell Django to use your custom User model instead of the default one
+AUTH_USER_MODEL = 'chats.User'
