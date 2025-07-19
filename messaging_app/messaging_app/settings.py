@@ -1,10 +1,14 @@
 INSTALLED_APPS = [
-    ...
-    'rest_framework',
-    'chats',  # new app for messaging functionality
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',       # ✅ أضف هذا
+    'chats',                # ✅ وأضف هذا أيضاً
 ]
 
-# Add this at the bottom of the file
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
