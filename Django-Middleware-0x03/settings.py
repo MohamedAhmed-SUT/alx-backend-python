@@ -12,3 +12,21 @@ MIDDLEWARE = [
     # Add your custom middleware here
     'chats.middleware.RequestLoggingMiddleware', 
 ]
+# In Django-Middleware-0x03/settings.py (add this at the bottom)
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+# In Django-Middleware-0x03/settings.py
+
+MIDDLEWARE = [
+    # ... other middleware
+    
+    # Your custom middleware classes
+    'chats.middleware.OffensiveLanguageMiddleware', # Add this new one
+    'chats.middleware.RestrictAccessByTimeMiddleware',
+    'chats.middleware.RequestLoggingMiddleware',
+]
