@@ -48,3 +48,15 @@ MIDDLEWARE = [
     'chats.middleware.RestrictAccessByTimeMiddleware',
     'chats.middleware.RequestLoggingMiddleware',
 ]
+# in Django-Middleware-0x03/settings.py
+
+MIDDLEWARE = [
+    # ... other middleware ...
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    
+    # Your custom middleware
+    'chats.middleware.RolepermissionMiddleware', # <-- ADD THIS with the correct name
+    'chats.middleware.OffensiveLanguageMiddleware',
+    'chats.middleware.RestrictAccessByTimeMiddleware',
+    'chats.middleware.RequestLoggingMiddleware',
+]
