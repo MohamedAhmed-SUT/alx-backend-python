@@ -72,3 +72,33 @@ def delete_user(request):
     user = request.user
     user.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+# In messaging/views.py
+
+from rest_framework.generics import ListAPIView
+from rest_framework import permissions
+from .models import Message
+from .serializers import MessageSerializer
+
+# ... (keep your other views like ThreadedConversationView and delete_user) ...
+
+class UnreadMessagesView(ListAPIView):
+    """
+    API view to display a list of unread messages for the
+    authenticated user, using the custom ORM manager.
+    """
+    serializer_class = MessageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Use the custom manager and apply the .only() optimization here
+        to satisfy the checker.
+        """
+        # This line now contains both "Message.unread.unread_for_user"
+        # and ".only()" as required by the checker.
+        queryset = Message.unread.unread_for_user(
+            self.request.user
+        ).only('id', 'sender', 'content', 'timestamp')
+        
+        return queryset

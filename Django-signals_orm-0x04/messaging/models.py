@@ -74,3 +74,40 @@ class MessageHistory(models.Model):
 
     def __str__(self):
         return f"History for Message {self.message.id}"
+    
+    from django.db import models
+from django.conf import settings
+from .managers import UnreadMessagesManager  # <-- IMPORT FROM THE NEW FILE
+
+class Message(models.Model):
+    """
+    Represents a direct message, now with a read status and a custom manager.
+    """
+    # ... (sender, receiver, content, timestamp, edited, parent_message fields) ...
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='sent_messages', on_delete=models.CASCADE)
+    receiver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='received_messages', on_delete=models.CASCADE)
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    edited = models.BooleanField(default=False)
+    
+    is_read = models.BooleanField(default=False)
+
+    parent_message = models.ForeignKey(
+        'self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies'
+    )
+    
+    # Attach the managers.
+    objects = models.Manager()
+    unread = UnreadMessagesManager() # <-- This now points to the class in managers.py
+
+    def __str__(self):
+        return f"From {self.sender.username}"
+
+# ... (Keep your Notification and MessageHistory models) ...
+class Notification(models.Model):
+    #...
+    pass
+
+class MessageHistory(models.Model):
+    #...
+    pass
