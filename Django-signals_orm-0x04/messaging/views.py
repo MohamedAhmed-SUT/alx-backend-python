@@ -102,3 +102,31 @@ class UnreadMessagesView(ListAPIView):
         ).only('id', 'sender', 'content', 'timestamp')
         
         return queryset
+    
+    # In messaging/views.py
+
+from django.views.decorators.cache import cache_page
+from django.http import JsonResponse
+from .models import Message
+import time
+
+# ... (keep your other class-based views and imports) ...
+
+
+# --- NEW CACHED VIEW FOR THIS TASK ---
+@cache_page(60) # Cache this view for 60 seconds
+def cached_message_list_view(request):
+    """
+    A view that lists all messages and is cached for 60 seconds.
+    """
+    # We add a small delay to simulate a slow database query.
+    # This will make the effect of caching obvious.
+    time.sleep(2)
+    
+    # Get the data from the database
+    messages = Message.objects.all().values(
+        'id', 'sender__username', 'receiver__username', 'content', 'timestamp'
+    )
+    
+    # Return a JSON response
+    return JsonResponse(list(messages), safe=False)
